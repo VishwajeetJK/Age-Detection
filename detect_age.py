@@ -53,23 +53,19 @@ for i in range(0, detections.shape[2]):
 	# prediction
 	confidence = detections[0, 0, i, 2]
 
-	# filter out weak detections by ensuring the confidence is
-	# greater than the minimum confidence
+	# filter out weak detections by ensuring the confidence is greater than the minimum confidence
 	if confidence > args["confidence"]:
-		# compute the (x, y)-coordinates of the bounding box for the
-		# object
+		# compute the (x, y)-coordinates of the bounding box for the object
 		box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
 		(startX, startY, endX, endY) = box.astype("int")
 
-		# extract the ROI of the face and then construct a blob from
-		# *only* the face ROI
+		# extract the ROI of the face and then construct a blob from *only* the face ROI
 		face = image[startY:endY, startX:endX]
 		faceBlob = cv2.dnn.blobFromImage(face, 1.0, (227, 227),
 			(78.4263377603, 87.7689143744, 114.895847746),
 			swapRB=False)
 
-		# make predictions on the age and find the age bucket with
-		# the largest corresponding probability
+		# make predictions on the age and find the age bucket with the largest corresponding probability
 		ageNet.setInput(faceBlob)
 		preds = ageNet.forward()
 		i = preds[0].argmax()
@@ -80,8 +76,7 @@ for i in range(0, detections.shape[2]):
 		text = "{}: {:.2f}%".format(age, ageConfidence * 100)
 		print("[INFO] {}".format(text))
 
-		# draw the bounding box of the face along with the associated
-		# predicted age
+		# draw the bounding box of the face along with the associated predicted age
 		y = startY - 10 if startY - 10 > 10 else startY + 10
 		cv2.rectangle(image, (startX, startY), (endX, endY),
 			(0, 0, 255), 2)
